@@ -1,5 +1,4 @@
 import { Command } from "@sapphire/framework";
-import { EmbedBuilder } from "discord.js";
 import { openaiClient } from "../index.js";
 
 export class PingCommand extends Command {
@@ -29,12 +28,10 @@ export class PingCommand extends Command {
     await interaction.deferReply();
     const response = await openaiClient.responses.create({
       model: "gpt-5-nano",
-      input: `${userInput}`,
+      input: userInput,
+      instructions: "Vasta lühidalt",
     });
-    const embed = new EmbedBuilder()
-      .setDescription(`${response.output_text}`)
-      .setColor("#317991");
 
-    return await interaction.editReply({ embeds: [embed] });
+    return await interaction.editReply(response.output_text);
   }
 }

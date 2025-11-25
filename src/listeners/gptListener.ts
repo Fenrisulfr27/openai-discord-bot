@@ -1,5 +1,5 @@
 import { Listener } from "@sapphire/framework";
-import type { Message } from "discord.js";
+import { NewsChannel, TextChannel, type Message } from "discord.js";
 import { openaiClient } from "../index.js";
 export class MessageMentionListener extends Listener {
   public constructor(
@@ -15,7 +15,9 @@ export class MessageMentionListener extends Listener {
     const mentionedBot = message.mentions.has(bot!);
     const isReply = !!message.reference?.messageId;
 
-    if (!mentionedBot) return;
+    if (message.channel.isTextBased()) {
+      await (message.channel as any).sendTyping();
+    }
 
     let userInput = message.content.replace(`<@${bot!.id}>`, "").trim();
 
@@ -26,7 +28,7 @@ export class MessageMentionListener extends Listener {
         );
         const repliedText = repliedMessage.content;
 
-        userInput = `${repliedText} ${userInput}`;
+        userInput = `${repliedMessage.member?.displayName}: ${repliedText} ${message.author.displayName}: ${userInput}`;
       } catch (err) {
         console.error("Reply fetch error:", err);
       }
@@ -35,7 +37,7 @@ export class MessageMentionListener extends Listener {
     const response = await openaiClient.responses.create({
       model: "gpt-5-nano",
       input: userInput,
-      instructions: "Vasta lühidalt",
+      instructions: "Vasta lühidalt, sa oled Bot nimega Süsi",
     });
 
     await message.reply(response.output_text || "Viga AI vastuses.");
