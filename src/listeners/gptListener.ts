@@ -1,6 +1,7 @@
 import { Listener } from "@sapphire/framework";
-import { NewsChannel, TextChannel, type Message } from "discord.js";
+import { TextChannel, type Message } from "discord.js";
 import { openaiClient } from "../index.js";
+
 export class MessageMentionListener extends Listener {
   public constructor(
     context: Listener.LoaderContext,
@@ -12,40 +13,74 @@ export class MessageMentionListener extends Listener {
   public async run(message: Message) {
     const bot = message.client.user;
     if (message.author.bot) return;
-    const mentionedBot = message.mentions.has(bot!);
-    const isReply = !!message.reference?.messageId;
+
+    const mentionedBot = message.mentions.has(bot);
+    const referenceId = message.reference?.messageId;
+
     if (!mentionedBot) return;
-    if (message.channel.isTextBased()) {
-      await (message.channel as any).sendTyping();
+
+    if (message.channel instanceof TextChannel) {
+      await message.channel.sendTyping();
     }
     const typingLoop = setInterval(() => {
-      if (message.channel.isTextBased()) {
-        (message.channel as any).sendTyping();
+      if (message.channel instanceof TextChannel) {
+        message.channel.sendTyping();
       }
     }, 8000);
 
-    let userInput = message.content.replace(`<@${bot!.id}>`, "").trim();
+    const inputBlocks: any[] = [];
 
-    if (isReply) {
-      try {
-        const repliedMessage = await message.channel.messages.fetch(
-          message.reference!.messageId!
-        );
-        const repliedText = repliedMessage.content;
+    if (referenceId) {
+      const repliedMessage = await message.channel.messages
+        .fetch(referenceId)
+        .catch(() => null);
 
-        userInput = `${repliedMessage.member?.displayName}: ${repliedText} ${message.author.displayName}: ${userInput}`;
-      } catch (err) {
-        console.error("Reply fetch error:", err);
+      if (repliedMessage) {
+        const isBotMessage = repliedMessage.author.id === bot.id;
+
+        if (isBotMessage) {
+          inputBlocks.push({
+            role: "assistant",
+            content: [
+              {
+                type: "output_text",
+                text: repliedMessage.content,
+                annotations: [],
+              },
+            ],
+          });
+        } else {
+          inputBlocks.push({
+            role: "user",
+            content: [
+              {
+                type: "input_text",
+                text: `
+               ${repliedMessage.content}`,
+              },
+            ],
+          });
+        }
       }
-      console.log(userInput);
     }
-    const response = await openaiClient.responses.create({
-      model: "gpt-5-nano",
-      input: userInput,
-      instructions: "Vasta lühidalt, sa oled Bot nimega Süsi",
+
+    inputBlocks.push({
+      role: "user",
+      content: [
+        {
+          type: "input_text",
+          text: ` ${message.content.replace(`<@${bot.id}>`, "").trim()}`,
+        },
+      ],
     });
 
-    await message.reply(response.output_text || "Viga AI vastuses.");
+    console.log("SISEND OPENAI-LE:", JSON.stringify(inputBlocks, null, 2));
+    const response = await openaiClient.responses.create({
+      model: "gpt-5-nano",
+      input: inputBlocks,
+      instructions: "Vasta lühidalt",
+    });
     clearInterval(typingLoop);
+    await message.reply(response.output_text || "Viga AI vastuses.");
   }
 }
