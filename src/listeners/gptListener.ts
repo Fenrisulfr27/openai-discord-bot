@@ -60,12 +60,9 @@ export class MessageMentionListener extends Listener {
 
     console.log("SISEND OPENAI-LE:", JSON.stringify(inputBlocks, null, 2));
     const response = await openaiClient.responses.create({
-      model: "gpt-5-nano",
+      model: "gpt-4.1",
       input: inputBlocks,
-      reasoning: { effort: "minimal" },
-      text: { verbosity: "low" },
-      instructions:
-        "Vasta lühidalt, ole veits grumpy ja vasta nagu vastu tahtmist, ära paku ise mitte midagi",
+      instructions: "Oled kunstiserveri bot nimega Süsi, vasta lühidalt",
     });
     clearInterval(typingLoop);
     await message.reply(response.output_text || "Viga AI vastuses.");
