@@ -4,21 +4,7 @@ Discord bot integrated with OpenAI, allowing users to interact with advanced AI 
 
 ---
 
-## ✨ Features
-
-- Responds **only when the bot is mentioned**.
-- Includes reply context:
-  - If the replied message is from the bot → marked as `assistant`
-  - If it's from a user → marked as `user`
-- Sends a **typing indicator** while generating a response.
-- Uses the OpenAI Responses API with:
-  - Model: `gpt-4.1`
-  - Instructions/persona: _“You are an art-server bot named Süsi, answer briefly.”_
-- Replies directly to the user in Discord.
-
----
-
-## 🚀 Installation & Setup
+## Installation & Setup
 
 ### 1. Install dependencies
 
@@ -26,14 +12,9 @@ Discord bot integrated with OpenAI, allowing users to interact with advanced AI 
 npm install
 ```
 
-Required packages include:
-
-- `@sapphire/framework`
-- `discord.js`
-- `openai`
-- `typescript` (if using TS)
-
 ### 2. Create an `.env` file
+
+see [env example](.env.example).
 
 ### 3. Run the bot
 
@@ -49,32 +30,6 @@ For development:
 ```bash
 npm run dev
 ```
-
----
-
-## 📌 Notes
-
-- The Responses API uses **input blocks**, so each message (assistant/user) is added as a separate block.
-- The bot’s personality is defined through the `instructions` field.
-- The typing indicator is refreshed every 8 seconds until a response is received.
-
----
-
-## 🧩 Customization
-
-You can easily modify:
-
-### Bot personality
-
-Change the instructions:
-
-> “You are an art-server bot named Süsi, answer briefly.”
-
-### Model
-
-Swap out the model used in the API request:
-
-> `gpt-4.1`
 
 ---
 
