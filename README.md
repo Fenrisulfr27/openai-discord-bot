@@ -1,6 +1,6 @@
-# 🪶 Süsi — Discord Art Server Bot
+# Discord Server Bot with OpenAI Integration
 
-Süsi is a Discord bot integrated with OpenAI, allowing users to interact with advanced AI features directly within their Discord server. The bot uses the **OpenAI Responses API** (model _gpt-4.1_) and includes short conversational memory by incorporating replied messages into context. The project includes configuration for Fly.io and GitHub Workflows, which are used for hosting and automating the deployment of the bot.
+Discord bot integrated with OpenAI, allowing users to interact with advanced AI features directly within their Discord server. The bot uses the OpenAI Responses API (model gpt-4.1) and includes short conversational memory by incorporating replied messages into context. It is built with Sapphire.js and discord.js. The project also includes configuration for Fly.io and GitHub Workflows, which are used for hosting and automating the deployment of the bot.
 
 ---
 
@@ -75,10 +75,6 @@ Change the instructions:
 Swap out the model used in the API request:
 
 > `gpt-4.1`
-
-### Behavior
-
-Add more listeners, commands, or adjust message handling through Sapphire’s framework structure.
 
 ---
 
